@@ -5,6 +5,7 @@ import { useSelector } from "react-redux"
 import { db } from "../../firebase"
 import { addDoc, collection, serverTimestamp } from "firebase/firestore"
 import type { RootState } from "../../store"
+import { setError } from "../../features/auth/authSlice"
 
 function CreatePostPage() {
   const [title, setTitle] = useState("")
@@ -30,7 +31,7 @@ function CreatePostPage() {
       navigate("/board")
     } catch (err) {
       console.error("게시글 작성 오류:", err)
-      alert("게시글 작성에 실패했습니다.")
+      setError("게시글 작성 중 문제가 발생했습니다.")
     }
   }
 
