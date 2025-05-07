@@ -7,6 +7,14 @@ export const store = configureStore({
     counter: counterReducer,
     auth: authReducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        // ✅ 직렬화 예외 설정
+        ignoredActions: ["auth/setUser"],
+        ignoredPaths: ["auth.user"],
+      },
+    }),
 })
 
 export type RootState = ReturnType<typeof store.getState>
