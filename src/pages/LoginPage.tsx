@@ -40,7 +40,7 @@ function LoginPage() {
 
   const handleRegister = async () => {
     dispatch(setLoading(true))
-    dispatch(setError(null)) // ✅ Error 초기화
+    dispatch(setError(null))
 
     try {
       await createUserWithEmailAndPassword(auth, email, password)

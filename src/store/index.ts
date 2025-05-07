@@ -10,7 +10,6 @@ export const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
-        // ✅ 직렬화 예외 설정
         ignoredActions: ["auth/setUser"],
         ignoredPaths: ["auth.user"],
       },
