@@ -20,29 +20,43 @@ function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     dispatch(setLoading(true))
-    navigate(-1)
+    dispatch(setError(null))
+
     try {
       await signInWithEmailAndPassword(auth, email, password)
+      navigate(-1)
     } catch (err: unknown) {
       if (err instanceof Error) {
-        dispatch(setError(err.message))
+        console.error("Error during login:", err)
+        dispatch(setError("로그인 중 문제가 발생했습니다. 다시 시도해주세요."))
       } else {
-        alert("알 수 없는 오류가 발생했습니다.")
+        console.error("Unexpected Error:", err)
+        dispatch(setError("알 수 없는 오류가 발생했습니다."))
       }
+    } finally {
+      dispatch(setLoading(false))
     }
   }
 
   const handleRegister = async () => {
     dispatch(setLoading(true))
+    dispatch(setError(null)) // ✅ Error 초기화
+
     try {
       await createUserWithEmailAndPassword(auth, email, password)
       navigate(-1)
     } catch (err: unknown) {
       if (err instanceof Error) {
-        dispatch(setError(err.message))
+        console.error("Error during registration:", err)
+        dispatch(
+          setError("회원가입 중 문제가 발생했습니다. 다시 시도해주세요.")
+        )
       } else {
-        alert("알 수 없는 오류가 발생했습니다.")
+        console.error("Unexpected Error:", err)
+        dispatch(setError("알 수 없는 오류가 발생했습니다."))
       }
+    } finally {
+      dispatch(setLoading(false))
     }
   }
 

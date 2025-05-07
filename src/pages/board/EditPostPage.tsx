@@ -4,12 +4,12 @@ import { db } from "../../firebase"
 import { doc, getDoc, updateDoc } from "firebase/firestore"
 import { useSelector } from "react-redux"
 import type { RootState } from "../../store"
-import { setError } from "../../features/auth/authSlice"
 
 function EditPostPage() {
   const { postId } = useParams()
   const [title, setTitle] = useState("")
   const [content, setContent] = useState("")
+  const [error, setError] = useState<string | null>(null)
   const { user } = useSelector((state: RootState) => state.auth)
   const navigate = useNavigate()
 
@@ -40,13 +40,25 @@ function EditPostPage() {
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault()
-    await updateDoc(doc(db, "posts", postId as string), { title, content })
-    navigate(`/board/${postId}`)
+    if (!title.trim() || !content.trim()) {
+      setError("제목과 내용을 모두 입력해야 합니다.")
+      return
+    }
+
+    try {
+      await updateDoc(doc(db, "posts", postId as string), { title, content })
+      navigate(`/board/${postId}`)
+    } catch (err) {
+      console.error("Error updating post:", err)
+      setError("게시글 수정 중 문제가 발생했습니다.")
+    }
   }
 
   return (
     <div className="max-w-lg mx-auto mt-10 p-4">
       <h1 className="text-2xl font-bold mb-4">게시글 수정</h1>
+      {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+
       <form onSubmit={handleUpdate} className="space-y-4">
         <input
           type="text"

@@ -5,10 +5,10 @@ import { useSelector } from "react-redux"
 import type { RootState } from "../../store"
 import type Post from "./types/Post"
 import { Link } from "react-router-dom"
-import { setError } from "../../features/auth/authSlice"
 
 function BoardPage() {
   const [posts, setPosts] = useState<Post[]>([])
+  const [error, setError] = useState<string | null>(null)
   const { user } = useSelector((state: RootState) => state.auth)
 
   useEffect(() => {
@@ -52,21 +52,27 @@ function BoardPage() {
       )}
 
       <div className="space-y-4 mt-4">
-        {user ? (
-          posts.map((post) => (
-            <div key={post.id} className="p-4 border rounded">
-              <Link
-                to={`/board/${post.id}`}
-                className="font-bold text-blue-600 hover:underline"
-              >
-                {post.title}
-              </Link>
-              <p>{post.content.slice(0, 100)}...</p>
-              <p className="text-sm text-gray-500">
-                작성자: {post.authorEmail ?? "익명"}
-              </p>
-            </div>
-          ))
+        {error ? (
+          <p className="text-red-500 text-center">{error}</p>
+        ) : user ? (
+          posts.length > 0 ? (
+            posts.map((post) => (
+              <div key={post.id} className="p-4 border rounded">
+                <Link
+                  to={`/board/${post.id}`}
+                  className="font-bold text-blue-600 hover:underline"
+                >
+                  {post.title}
+                </Link>
+                <p>{post.content.slice(0, 100)}...</p>
+                <p className="text-sm text-gray-500">
+                  작성자: {post.authorEmail ?? "익명"}
+                </p>
+              </div>
+            ))
+          ) : (
+            <p className="text-gray-500">게시글이 없습니다.</p>
+          )
         ) : (
           <p className="text-gray-500">
             로그인 후 게시글을 확인할 수 있습니다.

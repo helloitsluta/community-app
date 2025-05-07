@@ -1,22 +1,28 @@
-// src/pages/board/CreatePostPage.tsx
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useSelector } from "react-redux"
 import { db } from "../../firebase"
 import { addDoc, collection, serverTimestamp } from "firebase/firestore"
 import type { RootState } from "../../store"
-import { setError } from "../../features/auth/authSlice"
 
 function CreatePostPage() {
   const [title, setTitle] = useState("")
   const [content, setContent] = useState("")
+  const [error, setError] = useState<string | null>(null)
   const { user } = useSelector((state: RootState) => state.auth)
   const navigate = useNavigate()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setError(null)
+
+    if (!title.trim() || !content.trim()) {
+      setError("제목과 내용을 모두 입력해야 합니다.")
+      return
+    }
+
     if (!user) {
-      alert("로그인 후 글을 작성할 수 있습니다.")
+      setError("로그인 후 글을 작성할 수 있습니다.")
       navigate("/login")
       return
     }
@@ -30,7 +36,7 @@ function CreatePostPage() {
       })
       navigate("/board")
     } catch (err) {
-      console.error("게시글 작성 오류:", err)
+      console.error("Error creating post:", err)
       setError("게시글 작성 중 문제가 발생했습니다.")
     }
   }
@@ -38,6 +44,8 @@ function CreatePostPage() {
   return (
     <div className="max-w-lg mx-auto mt-10 p-4">
       <h1 className="text-2xl font-bold mb-4">새 글 작성</h1>
+      {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
           type="text"

@@ -5,11 +5,11 @@ import { doc, getDoc, deleteDoc } from "firebase/firestore"
 import { useSelector } from "react-redux"
 import type { RootState } from "../../store"
 import type Post from "./types/Post"
-import { setError } from "../../features/auth/authSlice"
 
 function PostDetailPage() {
   const { postId } = useParams()
   const [post, setPost] = useState<Post | null>(null)
+  const [error, setError] = useState<string | null>(null)
   const { user } = useSelector((state: RootState) => state.auth)
   const navigate = useNavigate()
 
@@ -34,13 +34,24 @@ function PostDetailPage() {
   }, [postId, navigate])
 
   const handleDelete = async () => {
-    if (window.confirm("정말로 삭제하시겠습니까?")) {
+    if (!window.confirm("정말로 삭제하시겠습니까?")) return
+
+    try {
       await deleteDoc(doc(db, "posts", postId as string))
       navigate("/board")
+    } catch (err) {
+      console.error("Error deleting post:", err)
+      setError("게시글 삭제 중 문제가 발생했습니다.")
     }
   }
 
-  if (!post) return <p>Loading...</p>
+  if (error) {
+    return <p className="text-red-500 text-center">{error}</p>
+  }
+
+  if (!post) {
+    return <p className="text-center">Loading...</p>
+  }
 
   return (
     <div className="max-w-2xl mx-auto mt-10 p-4">
