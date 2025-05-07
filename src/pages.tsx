@@ -1,7 +1,6 @@
 // src/routes.tsx
 import { lazy } from "react"
 
-// ✅ 페이지 목록 배열 (동적으로 관리)
 const pages = [
   {
     path: "/",
@@ -14,13 +13,34 @@ const pages = [
     title: "Board",
     component: lazy(() => import("./pages/board/BoardPage")),
     showOnNavBar: true,
+    children: [
+      {
+        path: "",
+        title: "Board Main",
+        component: lazy(() => import("./pages/board/BoardPage")),
+        showOnNavBar: false,
+      },
+      {
+        path: "create",
+        title: "Create Post",
+        component: lazy(() => import("./pages/board/CreatePostPage")),
+        showOnNavBar: false,
+      },
+      {
+        path: ":postId",
+        title: "Post Detail",
+        component: lazy(() => import("./pages/board/PostDetailPage")),
+        showOnNavBar: false,
+      },
+      {
+        path: ":postId/edit",
+        title: "Edit Post",
+        component: lazy(() => import("./pages/board/EditPostPage")),
+        showOnNavBar: false,
+      },
+    ],
   },
-  {
-    path: "/board/create",
-    title: "Create Post",
-    component: lazy(() => import("./pages/board/CreatePostPage")),
-    showOnNavBar: false,
-  },
+
   {
     path: "/counter",
     title: "Counter",

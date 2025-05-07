@@ -8,16 +8,23 @@ function App() {
       <NavBar />
       <Routes>
         {pages.map((p) => {
-          const Component = p.component
-          if (p.path.startsWith("/board")) {
+          if (p.path === "/board") {
             return (
-              <Route path="/board" key="board">
-                <Route index element={<Component />} />
-                <Route path="create" element={<p.component />} />
+              <Route path="board" key="board">
+                <Route index element={<p.component />} /> {/* BoardPage */}
+                {p.children?.map((child) => {
+                  return (
+                    <Route
+                      key={child.path}
+                      path={child.path}
+                      element={<child.component />}
+                    />
+                  )
+                })}
               </Route>
             )
           }
-          return <Route key={p.path} path={p.path} element={<Component />} />
+          return <Route key={p.path} path={p.path} element={<p.component />} />
         })}
       </Routes>
     </BrowserRouter>

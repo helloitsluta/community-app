@@ -1,33 +1,43 @@
-// src/pages/BoardPage.tsx
 import { useEffect, useState } from "react"
 import { db } from "../../firebase"
 import { collection, query, onSnapshot, orderBy } from "firebase/firestore"
 import { useSelector } from "react-redux"
 import type { RootState } from "../../store"
-
-interface Post {
-  id: string
-  title: string
-  content: string
-  authorEmail?: string
-  createdAt: string
-}
+import type Post from "./types/Post"
+import { Link } from "react-router-dom"
+import { setError } from "../../features/auth/authSlice"
 
 function BoardPage() {
   const [posts, setPosts] = useState<Post[]>([])
   const { user } = useSelector((state: RootState) => state.auth)
 
   useEffect(() => {
-    const q = query(collection(db, "posts"), orderBy("createdAt", "desc"))
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const postList = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Post[]
-      setPosts(postList)
-    })
+    const fetchPosts = async () => {
+      try {
+        const q = query(collection(db, "posts"), orderBy("createdAt", "desc"))
+        const unsubscribe = onSnapshot(
+          q,
+          (snapshot) => {
+            const postList = snapshot.docs.map((doc) => ({
+              id: doc.id,
+              ...doc.data(),
+            })) as Post[]
+            setPosts(postList)
+          },
+          (error) => {
+            console.error("Error fetching posts:", error)
+            setError("게시글을 불러오는 중 문제가 발생했습니다.")
+          }
+        )
 
-    return () => unsubscribe()
+        return () => unsubscribe()
+      } catch (err) {
+        console.error("Unexpected Error:", err)
+        setError("게시글을 불러오는 중 문제가 발생했습니다.")
+      }
+    }
+
+    fetchPosts()
   }, [])
 
   return (
@@ -42,15 +52,26 @@ function BoardPage() {
       )}
 
       <div className="space-y-4 mt-4">
-        {posts.map((post) => (
-          <div key={post.id} className="p-4 border rounded">
-            <h2 className="font-bold">{post.title}</h2>
-            <p>{post.content}</p>
-            <p className="text-sm text-gray-500">
-              작성자: {post.authorEmail ?? "익명"}
-            </p>
-          </div>
-        ))}
+        {user ? (
+          posts.map((post) => (
+            <div key={post.id} className="p-4 border rounded">
+              <Link
+                to={`/board/${post.id}`}
+                className="font-bold text-blue-600 hover:underline"
+              >
+                {post.title}
+              </Link>
+              <p>{post.content.slice(0, 100)}...</p>
+              <p className="text-sm text-gray-500">
+                작성자: {post.authorEmail ?? "익명"}
+              </p>
+            </div>
+          ))
+        ) : (
+          <p className="text-gray-500">
+            로그인 후 게시글을 확인할 수 있습니다.
+          </p>
+        )}
       </div>
     </div>
   )
