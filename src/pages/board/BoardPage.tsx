@@ -1,9 +1,9 @@
 // src/pages/BoardPage.tsx
 import { useEffect, useState } from "react"
-import { db } from "../firebase"
+import { db } from "../../firebase"
 import { collection, query, onSnapshot, orderBy } from "firebase/firestore"
 import { useSelector } from "react-redux"
-import type { RootState } from "../store"
+import type { RootState } from "../../store"
 
 interface Post {
   id: string
@@ -35,7 +35,7 @@ function BoardPage() {
       <h1 className="text-2xl font-bold mb-4">게시판</h1>
       {user ? (
         <a href="/board/create" className="text-blue-500 mb-4 inline-block">
-          ➕ 새 글 작성
+          새 글 작성
         </a>
       ) : (
         <p className="text-gray-500">로그인 후 글을 작성할 수 있습니다.</p>

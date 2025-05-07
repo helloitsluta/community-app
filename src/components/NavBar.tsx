@@ -3,6 +3,7 @@ import { signOut } from "firebase/auth"
 import { auth } from "../firebase"
 import { useSelector } from "react-redux"
 import type { RootState } from "../store"
+import pages from "../pages"
 
 const NavBar: React.FC = () => {
   const navigate = useNavigate()
@@ -16,12 +17,17 @@ const NavBar: React.FC = () => {
   return (
     <nav className="bg-gray-800 text-white p-4 flex justify-between items-center">
       <div className="flex items-center space-x-4">
-        <Link to="/" className="text-lg font-semibold hover:underline">
-          Home
-        </Link>
-        <Link to="/board" className="text-lg font-semibold hover:underline">
-          Board
-        </Link>
+        {pages
+          .filter((p) => p.showOnNavBar)
+          .map((p) => (
+            <Link
+              key={p.path}
+              to={p.path}
+              className="text-lg font-semibold hover:underline"
+            >
+              {p.title}
+            </Link>
+          ))}
       </div>
 
       <div>
